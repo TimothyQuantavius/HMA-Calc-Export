@@ -78,8 +78,20 @@ mondata.each_with_index do |line, i|
 
 		# p species
 
-		learnset = ls_info[species.upcase.gsub("-GALAR", "-G").gsub("-ALOLA", "-A")]["Level-Up Learnset"]
-
+		key = species.upcase.gsub("-GALAR", "-G").gsub("-ALOLA", "-A")
+if ls_info[key] && ls_info[key]["Level-Up Learnset"]
+  learnset = ls_info[key]["Level-Up Learnset"]
+  learnset.each_with_index do |ls, i|
+    ls[1] = capitalize_words(ls[1])
+    if showdown_subs[ls[1].to_sym]
+      ls[1] = showdown_subs[ls[1].to_sym]
+    end
+    learnset[i] = ls
+  end
+else
+  p "Missing learnset for #{species}"
+  learnset = []
+end
 		learnset.each_with_index do |ls, i|
 			ls[1] = capitalize_words(ls[1])
 			if showdown_subs[ls[1].to_sym]
@@ -96,7 +108,14 @@ mondata.each_with_index do |line, i|
 		mons[species]["learnset_info"]["learnset"] = learnset
 
 		if tms[species.upcase.gsub("-GALAR", "-G").gsub("-ALOLA", "-A")]["TM Moves Compatibility"]
-			mons[species]["learnset_info"]["tms"] = tms[species.upcase.gsub("-GALAR", "-G").gsub("-ALOLA", "-A")]["TM Moves Compatibility"].map {|m| capitalize_words(m.split(" - ")[1])}
+key = species.upcase.gsub("-GALAR", "-G").gsub("-ALOLA", "-A")
+if tms[key] && tms[key]["TM Moves Compatibility"]
+  mons[species]["learnset_info"]["tms"] = tms[key]["TM Moves Compatibility"].map { |m| capitalize_words(m.split(" - ")[1]) }
+else
+  p "Missing TM data for #{species}"
+  mons[species]["learnset_info"]["tms"] = []
+end
+
 		else
 			mons[species]["learnset_info"]["tms"] = []
 		end
